@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="controls">
+  <button onclick="seed()">Load Sample Emails</button>
+  <select id="folder" onchange="loadEmails()">
+    <option value="all">All</option>
+    <option value="not_spam">Not Spam</option>
+    <option value="spam">Spam</option>
+  </select>
+</section>
+<section id="list"></section>
+
+<section class="composer">
+  <h2>Compose with Prompt Enhancer</h2>
+  <textarea id="prompt" placeholder="Enter short prompt or keywords"></textarea>
+  <div class="row">
+    <label>Tone:
+      <select id="tone">
+        <option>formal</option><option>neutral</option><option>friendly</option><option>persuasive</option><option>concise</option>
+      </select>
+    </label>
+    <label>Length:
+      <select id="length">
+        <option>short</option><option selected>medium</option><option>detailed</option>
+      </select>
+    </label>
+    <label>Language:
+      <select id="lang">
+        <option value="en" selected>English</option>
+        <option value="hi">Hindi</option>
+        <option value="te">Telugu</option>
+        <option value="ta">Tamil</option>
+      </select>
+    </label>
+  </div>
+  <button onclick="draft()">Generate Draft</button>
+  <pre id="draft"></pre>
+</section>
+
+<script>
+async function seed(){
+  await fetch('/emails/ingest/sample', {method:'POST'});
+  loadEmails();
+}
+async function loadEmails(){
+  const f = document.getElementById('folder').value;
+  const res = await fetch('/emails?folder='+f);
+  const data = await res.json();
+  const list = document.getElementById('list');
+  list.innerHTML = data.map(e => `
+    <div class="email">
+      <div class="head"><b>${e.subject||"(no subject)"}</b> — <i>${e.from_addr||""}</i></div>
+      <div class="body">${(e.body_text||"").slice(0,300)}</div>
+      <div class="actions">
+        <button onclick="mark(${e.id}, false)">Not Spam</button>
+        <button onclick="mark(${e.id}, true)">Spam</button>
+      </div>
+    </div>
+  `).join('');
+}
+async function mark(id, spam){
+  await fetch('/emails/mark/'+id+'?spam='+spam, {method:'POST'});
+  loadEmails();
+}
+async function draft(){
+  const prompt = document.getElementById('prompt').value;
+  const tone = document.getElementById('tone').value;
+  const length = document.getElementById('length').value;
+  const target_lang = document.getElementById('lang').value;
+  const res = await fetch('/generate/draft', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({prompt, tone, length, target_lang})
+  });
+  const data = await res.json();
+  document.getElementById('draft').textContent = "Subject: "+data.subject+"\n\n"+data.body;
+}
+loadEmails();
+</script>
+<!-- under <section class="controls"> ... -->
+<button onclick="signin()">Sign in with Google</button>
+<script>
+async function signin(){
+  const r = await fetch('/auth/google');
+  const d = await r.json();
+  // d.auth_url contains Google's OAuth URL
+  window.location.href = d.auth_url;
+}
+</script>
+<input id="me" placeholder="your Gmail address" value="yaswanthpuritipati2005@gmail.com" />
+<button onclick="syncNow()">Sync Gmail</button>
+<script>
+async function syncNow(){
+  const me = document.getElementById('me').value.trim();
+  if(!me) return alert('Enter your Gmail address.');
+  const r = await fetch('/emails/sync?user_email='+encodeURIComponent(me)+'&max_results=50', {method:'POST'});
+  const d = await r.json();
+  alert('Synced: ' + (d.inserted||0) + ' new emails');
+  loadEmails();
+}
+</script>
+
+{% endblock %}
