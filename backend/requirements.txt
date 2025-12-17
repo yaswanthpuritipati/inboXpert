@@ -13,3 +13,5 @@ langdetect==1.0.9
 pydantic==2.9.2
 pydantic-settings==2.6.1
 SQLAlchemy==2.0.36
+ctransformers==0.2.27
+huggingface-hub==0.26.2

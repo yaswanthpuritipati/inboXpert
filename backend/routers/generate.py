@@ -31,3 +31,16 @@ def create_draft(req: DraftReq):
     except Exception as e:
         logger.exception("Error generating draft")
         raise HTTPException(status_code=500, detail=str(e))
+
+class SummaryReq(BaseModel):
+    text: str
+    length: int = 3
+
+@router.post("/summary")
+def create_summary(req: SummaryReq):
+    try:
+        from ..services.nlp import textrank_summary
+        return {"summary": textrank_summary(req.text, k=req.length)}
+    except Exception as e:
+        logger.exception("Error generating summary")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -13,6 +13,8 @@ from .routers import send as send_router
 
 ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(ENV_PATH)
+print(f"DEBUG: Loaded .env from {ENV_PATH}")
+print(f"DEBUG: LLM_PROVIDER = {os.getenv('LLM_PROVIDER')}")
 
 class Settings(BaseSettings):
 

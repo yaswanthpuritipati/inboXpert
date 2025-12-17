@@ -9,7 +9,8 @@ Environment:
   LLM_PROVIDER - optional (default: "openai", options: "openai", "gemini", "ollama")
   OPENAI_API_KEY - required if LLM_PROVIDER=openai
   GEMINI_API_KEY - required if LLM_PROVIDER=gemini
-  EMAIL_GEN_MODEL - optional (default: gpt-3.5-turbo for openai, gemini-2.5-flash for gemini, llama2 for ollama)
+  EMAIL_GEN_MODEL - optional (default: gpt-3.5-turbo for openai, gemini-2.5-flash for gemini, llama2 for ollama, tinyllama for local)
+  LOCAL_MODEL_PATH - optional (path to GGUF file for local provider)
 """
 
 import os
@@ -36,16 +37,29 @@ try:
 except Exception:
     _HAS_OPENAI = False
 
+# try local model dependencies
+try:
+    from ctransformers import AutoModelForCausalLM
+    _HAS_LOCAL = True
+except ImportError as e:
+    print(f"DEBUG: Failed to import ctransformers: {e}")
+    _HAS_LOCAL = False
+
 # Configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", or "ollama"
+PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", "ollama", or "local"
+PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", "ollama", or "local"
+LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH")
+LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", etc.
 
 # Set default model based on provider
 if PROVIDER == "gemini":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.5-flash")
 elif PROVIDER == "ollama":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "llama2")
+elif PROVIDER == "local":
+    MODEL = os.getenv("EMAIL_GEN_MODEL", "tinyllama")
 else:
     MODEL = os.getenv("EMAIL_GEN_MODEL", "gpt-3.5-turbo")
     # For OpenAI, if SDK installed prefer it, else use HTTP
@@ -329,6 +343,7 @@ def call_ollama_api(messages, model="llama2", temperature=0.2, max_tokens=500):
     payload = {
         "model": model,
         "messages": ollama_messages,
+        "stream": False,
         "options": {
             "temperature": temperature,
             "num_predict": max_tokens
@@ -345,12 +360,142 @@ def call_ollama_api(messages, model="llama2", temperature=0.2, max_tokens=500):
         raise RuntimeError("Unexpected response from Ollama API: " + str(data))
 
 
+# Global instance for local model to avoid reloading
+_local_llm_instance = None
+
+def get_local_llm(model_name="tinyllama"):
+    global _local_llm_instance
+    if _local_llm_instance is not None:
+        return _local_llm_instance
+        
+    if not _HAS_LOCAL:
+        raise RuntimeError("Local model dependencies not installed. Please run: pip install ctransformers")
+        
+    # Default to TinyLlama 1.1B Chat
+    repo_id = "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
+    model_file = "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    model_type = "llama"
+
+    if model_name == "mistral":
+        repo_id = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
+        model_file = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+        model_type = "mistral"
+
+    # If user provided a path, use it
+    if LOCAL_MODEL_PATH:
+        repo_id = None # local file
+        model_file = LOCAL_MODEL_PATH
+        model_type = LOCAL_MODEL_TYPE
+    
+    try:
+        if sys.version_info >= (3, 12):
+            logger.warning("WARNING: You are running Python 3.12+. 'ctransformers' may hang or fail. Consider using Ollama or Python 3.11.")
+            print("WARNING: You are running Python 3.12+. 'ctransformers' may hang or fail. Consider using Ollama or Python 3.11.")
+
+        print(f"DEBUG: Loading local model (type={model_type}) from {model_file}...")
+        logger.info(f"Loading local model (type={model_type}) from {model_file}...")
+        _local_llm_instance = AutoModelForCausalLM.from_pretrained(
+            repo_id if repo_id else os.path.dirname(model_file),
+            model_file=model_file if repo_id else os.path.basename(model_file),
+            model_type=model_type,
+            context_length=2048,
+            gpu_layers=0,
+            threads=os.cpu_count() or 4
+        )
+        print("DEBUG: Model loaded successfully.")
+        return _local_llm_instance
+    except Exception as e:
+        print(f"DEBUG: Failed to load model: {e}")
+        raise RuntimeError(f"Failed to initialize local model: {str(e)}")
+
+
+def call_local_model(messages, model="tinyllama", temperature=0.2, max_tokens=500):
+    """Call local GGUF model via ctransformers"""
+    llm = get_local_llm(model)
+    
+    prompt = ""
+    
+    if model == "mistral":
+        # Mistral Instruct format
+        # [INST] <instruction> [/INST]
+        
+        system_msg = next((m for m in messages if m["role"] == "system"), None)
+        system_content = system_msg["content"] if system_msg else ""
+        
+        # We will construct the prompt by iterating.
+        # If we have consecutive user messages, we join them.
+        
+        current_user_content = []
+        if system_content:
+            current_user_content.append(system_content)
+            
+        for msg in messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            
+            if role == "system":
+                continue
+            
+            if role == "user":
+                current_user_content.append(content)
+            elif role == "assistant":
+                # Flush user content if any
+                if current_user_content:
+                    full_user_text = "\n\n".join(current_user_content)
+                    prompt += f"[INST] {full_user_text} [/INST]"
+                    current_user_content = []
+                
+                prompt += f"{content}</s>"
+        
+        # Flush remaining user content
+        if current_user_content:
+            full_user_text = "\n\n".join(current_user_content)
+            prompt += f"[INST] {full_user_text} [/INST]"
+            
+    else:
+        # Simple chat prompt formatting for TinyLlama/Llama 2
+        # System prompt
+        system_msg = next((m for m in messages if m["role"] == "system"), None)
+        if system_msg:
+            prompt += f"<|system|>\n{system_msg['content']}</s>\n"
+        
+        # User/Assistant turns
+        for msg in messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            if role == "user":
+                prompt += f"<|user|>\n{content}</s>\n"
+            elif role == "assistant":
+                prompt += f"<|assistant|>\n{content}</s>\n"
+                
+        # Prompt for generation
+        prompt += "<|assistant|>\n"
+    
+    try:
+        # ctransformers generate returns a generator or string
+        stop_tokens = ["</s>"]
+        if model != "mistral":
+            stop_tokens.append("<|user|>")
+            
+        response = llm(
+            prompt, 
+            max_new_tokens=max_tokens, 
+            temperature=temperature,
+            stop=stop_tokens
+        )
+        return response
+    except Exception as e:
+        raise RuntimeError(f"Local model generation failed: {str(e)}")
+
+
 def llm_chat(messages, model=MODEL, temperature=0.2, max_tokens=500):
     """Unified LLM chat interface supporting multiple providers"""
     if PROVIDER == "gemini":
         return call_gemini_api(messages, model=model or "gemini-2.5-flash", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "ollama":
         return call_ollama_api(messages, model=model or "llama2", temperature=temperature, max_tokens=max_tokens)
+    elif PROVIDER == "local":
+        return call_local_model(messages, model=model or "tinyllama", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "openai" and _HAS_OPENAI:
         return call_openai_sdk(messages, model=model, temperature=temperature, max_tokens=max_tokens)
     else:

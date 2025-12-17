@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends  # type: ignore
 from pydantic import BaseModel  # type: ignore
 from googleapiclient.discovery import build
 from sqlalchemy.orm import Session  # type: ignore
-from ..models.db import get_session
+from ..models.db import get_session, Email
 from .sync import load_creds
 
 router = APIRouter(tags=["send"])
@@ -54,6 +54,21 @@ def send_email(req: SendEmailRequest, session: Session = Depends(get_session)):
         # Send the message
         sent_message = service.users().messages().send(userId="me", body=message).execute()
         
+        # Save to local DB so it appears in "Sent" immediately
+        new_email = Email(
+            user_email=user_email,
+            gmail_id=sent_message.get("id"),
+            from_addr=user_email,
+            to_addr=req.to,
+            subject=req.subject,
+            snippet=req.body[:100], # Simple snippet
+            body_text=req.body,
+            is_spam=False,
+            lang="en"
+        )
+        session.add(new_email)
+        session.commit()
+
         return {
             "ok": True,
             "id": sent_message.get("id"),

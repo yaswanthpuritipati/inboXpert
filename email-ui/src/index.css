@@ -1,0 +1,672 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Modern Color Palette (Indigo/Slate based) */
+    --color-primary: #6366f1;
+    --color-primary-hover: #4f46e5;
+    --color-primary-glow: rgba(99, 102, 241, 0.4);
+    --color-secondary: #64748b;
+    --color-accent: #8b5cf6;
+
+    /* Gradient accents */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    --gradient-shine: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+
+    /* Backgrounds */
+    --bg-app: #f8fafc;
+    --bg-panel: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-selected: #e0e7ff;
+    --bg-glass: rgba(255, 255, 255, 0.8);
+
+    /* Text colors */
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+
+    /* Border */
+    --border-color: #e2e8f0;
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px var(--color-primary-glow);
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Dark Mode */
+body.dark-mode {
+    --bg-app: #0f172a;
+    --bg-panel: #1e293b;
+    --bg-hover: #334155;
+    --bg-selected: #312e81;
+    --bg-glass: rgba(30, 41, 59, 0.85);
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-light: #64748b;
+
+    --border-color: #334155;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* ===========================================
+   Base Styles
+   =========================================== */
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+#root {
+    height: 100%;
+}
+
+/* ===========================================
+   Scrollbar Styling
+   =========================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ===========================================
+   Button Enhancements
+   =========================================== */
+.btn {
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-shine);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    background: var(--gradient-primary);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-light:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===========================================
+   Form Enhancements
+   =========================================== */
+.form-control {
+    transition: all var(--transition-normal);
+    border: 1px solid var(--border-color);
+}
+
+.form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.form-check-input {
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+/* ===========================================
+   Animations
+   =========================================== */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px var(--color-primary-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--color-primary-glow);
+    }
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.fade-in-up {
+    animation: fadeInUp var(--transition-normal) ease-out;
+}
+
+.slide-in {
+    animation: slideIn var(--transition-spring) ease-out;
+}
+
+/* ===========================================
+   Skeleton Loading
+   =========================================== */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-hover) 25%, var(--bg-app) 50%, var(--bg-hover) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ===========================================
+   Email Row Enhancements
+   =========================================== */
+.email-row {
+    transition: all var(--transition-normal);
+    border-left: 3px solid transparent;
+}
+
+.email-row:hover {
+    background-color: var(--bg-hover) !important;
+    border-left-color: var(--color-primary);
+}
+
+.email-row.selected {
+    background-color: var(--bg-selected) !important;
+    border-left-color: var(--color-primary);
+}
+
+/* Star animation */
+.star-icon {
+    transition: all var(--transition-fast);
+}
+
+.star-icon:hover {
+    transform: scale(1.2);
+}
+
+.star-icon.starred {
+    animation: pulse 0.3s ease-out;
+}
+
+/* Hover actions slide in */
+.hover-actions {
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all var(--transition-normal);
+}
+
+.email-row:hover .hover-actions {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ===========================================
+   Sidebar Enhancements
+   =========================================== */
+.sidebar {
+    transition: all var(--transition-normal);
+}
+
+.sidebar-item {
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.sidebar-item:hover {
+    transform: translateX(4px);
+}
+
+.sidebar-item.active {
+    background: var(--bg-selected) !important;
+}
+
+.sidebar-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--gradient-primary);
+    border-radius: 0 4px 4px 0;
+}
+
+.compose-btn {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.compose-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow) !important;
+}
+
+/* ===========================================
+   Reading Pane Enhancements
+   =========================================== */
+.reading-pane {
+    animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.ai-summary-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-primary);
+    border-image: var(--gradient-primary) 1;
+}
+
+/* ===========================================
+   Modal Enhancements
+   =========================================== */
+.modal-content {
+    backdrop-filter: blur(10px);
+    animation: fadeInUp var(--transition-spring) ease-out;
+}
+
+.modal.show .modal-dialog {
+    animation: fadeInUp var(--transition-spring) ease-out;
+}
+
+.modal-header {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-header .modal-title {
+    color: white;
+}
+
+.modal-header .modal-title i {
+    color: white !important;
+}
+
+/* ===========================================
+   Toast Enhancements
+   =========================================== */
+.toast-container .toast {
+    animation: slideIn var(--transition-spring) ease-out;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+.toast.bg-success {
+    background: var(--gradient-success) !important;
+}
+
+.toast.bg-danger {
+    background: var(--gradient-danger) !important;
+}
+
+.toast-progress {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.5);
+    animation: progressBar 4s linear forwards;
+}
+
+/* ===========================================
+   Utility Classes
+   =========================================== */
+.text-primary {
+    color: var(--color-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-primary-subtle {
+    background-color: var(--bg-selected) !important;
+}
+
+.hover-bg-light:hover {
+    background-color: var(--bg-hover) !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.minw-0 {
+    min-width: 0;
+}
+
+.transition-all {
+    transition: all var(--transition-normal);
+}
+
+.group:hover .group-hover-opacity-100 {
+    opacity: 1 !important;
+}
+
+.transition-opacity {
+    transition: opacity var(--transition-fast);
+}
+
+/* Glassmorphism */
+.glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Focus ring for accessibility */
+.focus-ring:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+/* Stagger animation for list items */
+.stagger-item {
+    animation: fadeInUp var(--transition-normal) ease-out backwards;
+}
+
+.stagger-item:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.stagger-item:nth-child(2) {
+    animation-delay: 50ms;
+}
+
+.stagger-item:nth-child(3) {
+    animation-delay: 100ms;
+}
+
+.stagger-item:nth-child(4) {
+    animation-delay: 150ms;
+}
+
+.stagger-item:nth-child(5) {
+    animation-delay: 200ms;
+}
+
+.stagger-item:nth-child(6) {
+    animation-delay: 250ms;
+}
+
+.stagger-item:nth-child(7) {
+    animation-delay: 300ms;
+}
+
+.stagger-item:nth-child(8) {
+    animation-delay: 350ms;
+}
+
+.stagger-item:nth-child(9) {
+    animation-delay: 400ms;
+}
+
+.stagger-item:nth-child(10) {
+    animation-delay: 450ms;
+}
+
+/* Brand gradient text */
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Refresh button spin on click */
+.refresh-spin {
+    animation: spin 0.5s ease-out;
+}
+
+/* ===========================================
+   Resize Divider
+   =========================================== */
+.resize-divider {
+    width: 8px;
+    background: transparent;
+    cursor: col-resize;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+    z-index: 10;
+    will-change: background;
+}
+
+.resize-divider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: var(--border-color);
+    transition: all 0.2s ease-out;
+    will-change: width, background, box-shadow;
+}
+
+.resize-divider:hover::before,
+.resize-divider.active::before {
+    width: 4px;
+    background: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.resize-divider:hover,
+.resize-divider.active {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.resize-handle {
+    opacity: 0;
+    color: var(--color-primary);
+    font-size: 12px;
+    transition: opacity 0.2s ease-out;
+    background: var(--bg-panel);
+    padding: 8px 2px;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.resize-divider:hover .resize-handle,
+.resize-divider.active .resize-handle {
+    opacity: 1;
+}
+
+/* Smooth panel resizing */
+.resize-panel {
+    will-change: width;
+}

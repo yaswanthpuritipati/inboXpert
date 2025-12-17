@@ -8,12 +8,29 @@ from ..services import nlp
 router = APIRouter()
 
 @router.get("", response_model=List[EmailOut])
-def list_emails(folder: Optional[str] = "all", session: Session = Depends(get_session)):
+def list_emails(folder: Optional[str] = "all", user_email: Optional[str] = None, session: Session = Depends(get_session)):
     q = session.query(Email).order_by(Email.received_at.desc())
-    if folder == "spam":
+    
+    # Filter by user if provided (multi-user support)
+    if user_email:
+        q = q.filter(Email.user_email == user_email)
+
+    if folder == "sent":
+        # Sent emails: from the user
+        if user_email:
+            q = q.filter(Email.from_addr.ilike(f"%{user_email}%"))
+    elif folder == "inbox":
+        q = q.filter(Email.is_spam == False)
+        if user_email:
+            q = q.filter(Email.from_addr.notilike(f"%{user_email}%"))
+    elif folder == "spam":
         q = q.filter(Email.is_spam == True)
     elif folder == "not_spam":
         q = q.filter(Email.is_spam == False)
+        # Exclude sent emails from "Not Spam" (Inbox) view if user_email is known
+        if user_email:
+            q = q.filter(Email.from_addr.notilike(f"%{user_email}%"))
+    
     return q.all()
 
 @router.post("/ingest/sample")

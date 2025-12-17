@@ -1,8 +1,0 @@
-{
-  "to": "recipient@example.com",
-  "subject": "Subject here",
-  "body": "HTML or plain text body here",
-  "attachments": [
-    "optional/path/to/file.pdf"
-  ]
-}
