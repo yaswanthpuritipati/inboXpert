@@ -65,7 +65,7 @@ LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", 
 
 # Set default model based on provider
 if PROVIDER == "gemini":
-    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.0-flash") # Updated to 2.0 default
+    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-1.5-flash") # Stable production model
 elif PROVIDER == "ollama":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "llama2")
 elif PROVIDER == "local":
@@ -261,8 +261,15 @@ def call_gemini_api(messages, model="gemini-2.5-flash", temperature=0.2, max_tok
     
     for attempt in range(max_retries):
         try:
-            # Increase timeout to 60 seconds to handle slow connections
             r = session.post(url, json=payload, headers=headers, timeout=(10, 60))
+            
+            # Handle Rate Limiting (429) explicitly
+            if r.status_code == 429:
+                wait_time = (attempt + 1) * 5 # Wait 5, 10... seconds
+                logger.warning(f"Rate limited (429). Waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
+                time.sleep(wait_time)
+                continue
+                
             r.raise_for_status()
             data = r.json()
             break

@@ -40,7 +40,10 @@ def flow_factory():
     )
 
 def tokens_dir():
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
+    # Use persistent disk on Render if available
+    base_dir = "/data/tokens" if os.path.exists("/data") else os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
+    os.makedirs(base_dir, exist_ok=True)
+    return base_dir
 
 @router.get("/auth/google")
 def auth_start():

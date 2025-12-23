@@ -11,7 +11,9 @@ import os, json
 router = APIRouter(tags=["sync"])
 
 def _token_path_for(email_addr: str) -> str:
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models", f"token_{email_addr}.json"))
+    # Use persistent disk on Render if available
+    base_dir = "/data/tokens" if os.path.exists("/data") else os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
+    return os.path.join(base_dir, f"token_{email_addr}.json")
 
 def load_creds(email_addr: str) -> Credentials:
     token_path = _token_path_for(email_addr)

@@ -3,7 +3,9 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from datetime import datetime
 
-DB_URL = os.environ.get("DB_URL", "sqlite:///./emailapp.db")
+# Determine database path (use persistent disk if on Render)
+DEFAULT_DB = "/data/emailapp.db" if os.path.exists("/data") else "./emailapp.db"
+DB_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DEFAULT_DB}")
 
 engine = create_engine(DB_URL, connect_args={"check_same_thread": False} if DB_URL.startswith("sqlite") else {})
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
