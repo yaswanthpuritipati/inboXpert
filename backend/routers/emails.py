@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from ..models.db import Email, get_session
-from ..models.schemas import EmailOut
-from ..services import nlp
+from backend.models.db import Email, get_session
+from backend.models.schemas import EmailOut
+from backend.services import nlp
 
 router = APIRouter()
 

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import logging
-from ..services.email_gen import generate_email_json_forced
+from backend.services.email_gen import generate_email_json_forced
 
 # simple logger
 logger = logging.getLogger("generate_router")
@@ -39,7 +39,7 @@ class SummaryReq(BaseModel):
 @router.post("/summary")
 def create_summary(req: SummaryReq):
     try:
-        from ..services.nlp import textrank_summary
+        from backend.services.nlp import textrank_summary
         return {"summary": textrank_summary(req.text, k=req.length)}
     except Exception as e:
         logger.exception("Error generating summary")

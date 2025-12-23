@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
-from ..models.db import Email, get_session
-from ..services.gmail import fetch_messages
-from ..services import nlp  # optional: for spam prediction
+from backend.models.db import Email, get_session
+from backend.services.gmail import fetch_messages
+from backend.services import nlp  # optional: for spam prediction
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build

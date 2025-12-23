@@ -1,5 +1,5 @@
-from .nlp import textrank_summary, best_matching_snippets, simple_intent, _split_sentences
-from .translation import detect_lang, translate_text
+from backend.services.nlp import textrank_summary, best_matching_snippets, simple_intent, _split_sentences
+from backend.services.translation import detect_lang, translate_text
 
 def enhance_prompt(user_prompt: str, context_text: str = "", tone: str = "formal", length: str = "medium", target_lang: str = "en"):
     src_lang = detect_lang(user_prompt) or "en"

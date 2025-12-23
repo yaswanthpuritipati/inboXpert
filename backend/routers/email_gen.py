@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from ..services.email_gen import generate_email
+from backend.services.email_gen import generate_email
 
 router = APIRouter(prefix="/generate", tags=["ai"])
 

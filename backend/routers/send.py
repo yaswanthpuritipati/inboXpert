@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, Depends  # type: ignore
 from pydantic import BaseModel  # type: ignore
 from googleapiclient.discovery import build
 from sqlalchemy.orm import Session  # type: ignore
-from ..models.db import get_session, Email
-from .sync import load_creds
+from backend.models.db import get_session, Email
+from backend.routers.sync import load_creds
 
 router = APIRouter(tags=["send"])
 
