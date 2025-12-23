@@ -1,20 +1,23 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables IMMEDIATELY before importing local modules
+ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(ENV_PATH)
+print(f"DEBUG: Loaded .env from {ENV_PATH}")
+print(f"DEBUG: LLM_PROVIDER = {os.getenv('LLM_PROVIDER')}")
+
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic_settings import BaseSettings
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
 from backend.models.db import init_db, get_session
 from backend.routers import auth, emails, generate
 from backend.routers import sync as sync_router
 from backend.routers import send as send_router 
 
-ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(ENV_PATH)
-print(f"DEBUG: Loaded .env from {ENV_PATH}")
-print(f"DEBUG: LLM_PROVIDER = {os.getenv('LLM_PROVIDER')}")
 
 class Settings(BaseSettings):
 

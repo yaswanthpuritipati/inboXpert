@@ -22,6 +22,11 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 import requests
 from requests.adapters import HTTPAdapter
+from dotenv import load_dotenv
+
+# Fallback load_dotenv for standalone usage/testing
+ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+load_dotenv(ENV_PATH)
 
 # Try to import Retry from urllib3 (it's a dependency of requests)
 try:
@@ -49,7 +54,7 @@ except ImportError as e:
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", "ollama", or "local"
-PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", "ollama", or "local"
+print(f"DEBUG email_gen: LLM_PROVIDER is {PROVIDER}")
 LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH")
 LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", etc.
 
