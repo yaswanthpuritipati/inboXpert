@@ -51,16 +51,21 @@ except ImportError as e:
     _HAS_LOCAL = False
 
 # Configuration
+# Configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()  # "openai", "gemini", "ollama", or "local"
+
+# FORCE GEMINI AS DEFAULT
+PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower() 
 print(f"DEBUG email_gen: LLM_PROVIDER is {PROVIDER}")
+print(f"DEBUG email_gen: GEMINI_API_KEY exists: {bool(GEMINI_API_KEY)}")
+
 LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH")
 LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", etc.
 
 # Set default model based on provider
 if PROVIDER == "gemini":
-    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.5-flash")
+    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.0-flash") # Updated to 2.0 default
 elif PROVIDER == "ollama":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "llama2")
 elif PROVIDER == "local":
