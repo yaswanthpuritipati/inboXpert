@@ -33,6 +33,10 @@ app.include_router(generate.router, prefix="/generate", tags=["generate"])
 app.include_router(sync_router.router)
 app.include_router(send_router.router, prefix="", tags=["send"])
 
+# Production Port handling (for Render/Heroku)
+import os
+PORT = int(os.environ.get("PORT", 8000))
+
 @app.on_event("startup")
 def on_startup():
     init_db()
@@ -47,13 +51,15 @@ def index(request: Request, session=Depends(get_session)):
 # CORS
 
 
-# Allow frontend (Vite React)
+# CORS
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # frontend URL
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],  # allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

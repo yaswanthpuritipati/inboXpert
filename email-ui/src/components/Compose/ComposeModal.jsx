@@ -81,7 +81,7 @@ export function ComposeModal({ userEmail, onSent, toast, initialData }) {
               />
             </div>
             
-            <div className="p-3 bg-light rounded-3 mb-3 border">
+            <div className="p-3 rounded-4 mb-3 border shadow-sm" style={{ backgroundColor: "var(--bg-hover)", borderColor: "var(--border-color)" }}>
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <label className="form-label small fw-bold text-primary mb-0">
                   <i className="bi bi-stars me-1" /> AI Assistant
@@ -134,8 +134,8 @@ export function ComposeModal({ userEmail, onSent, toast, initialData }) {
             </div>
 
             {draft && (
-              <div className="border rounded-3 overflow-hidden">
-                <div className="bg-light px-3 py-2 border-bottom">
+              <div className="border rounded-4 overflow-hidden shadow-sm" style={{ borderColor: "var(--border-color)" }}>
+                <div className="px-3 py-2 border-bottom" style={{ backgroundColor: "var(--bg-hover)", borderColor: "var(--border-color)" }}>
                   <input 
                     className="form-control-plaintext fw-bold" 
                     value={draft.subject} 
@@ -143,11 +143,11 @@ export function ComposeModal({ userEmail, onSent, toast, initialData }) {
                   />
                 </div>
                 <textarea 
-                  className="form-control border-0 p-3" 
+                  className="form-control border-0 p-3 text-main" 
                   rows={8} 
                   value={draft.body} 
                   onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-                  style={{ resize: "none" }}
+                  style={{ resize: "none", backgroundColor: "transparent" }}
                 />
               </div>
             )}

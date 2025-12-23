@@ -1,37 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Modern Color Palette (Indigo/Slate based) */
-    --color-primary: #6366f1;
-    --color-primary-hover: #4f46e5;
-    --color-primary-glow: rgba(99, 102, 241, 0.4);
-    --color-secondary: #64748b;
-    --color-accent: #8b5cf6;
+    /* Color Palette (Modern Professional Blue) */
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-glow: rgba(37, 99, 235, 0.3);
+    --color-secondary: #475569;
+    --color-accent: #0ea5e9;
 
     /* Gradient accents */
-    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-    --gradient-shine: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+    --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    --gradient-danger: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    --gradient-shine: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+
+    /* Folder-specific Professional Blue Gradients */
+    --gradient-inbox: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    --gradient-sent: linear-gradient(135deg, #334155 0%, #475569 100%);
+    --gradient-spam: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
+    --gradient-archive: linear-gradient(135deg, #065f46 0%, #059669 100%);
+    --gradient-not-spam: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
 
     /* Backgrounds */
     --bg-app: #f8fafc;
     --bg-panel: #ffffff;
     --bg-hover: #f1f5f9;
-    --bg-selected: #e0e7ff;
-    --bg-glass: rgba(255, 255, 255, 0.8);
+    --bg-selected: #e2e8f0;
+    --bg-glass: rgba(255, 255, 255, 0.7);
 
     /* Text colors */
     --text-main: #0f172a;
-    --text-muted: #64748b;
+    --text-muted: #475569;
     --text-light: #94a3b8;
 
     /* Border */
-    --border-color: #e2e8f0;
-    --border-radius-sm: 0.375rem;
-    --border-radius-md: 0.5rem;
-    --border-radius-lg: 0.75rem;
-    --border-radius-xl: 1rem;
+    --border-color: #f1f5f9;
+    --border-radius-sm: 0.5rem;
+    --border-radius-md: 0.75rem;
+    --border-radius-lg: 1rem;
+    --border-radius-xl: 1.25rem;
 
     /* Spacing */
     --spacing-xs: 0.25rem;
@@ -41,33 +48,49 @@
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 20px var(--color-primary-glow);
+    --shadow-md: 0 4px 20px -1px rgb(0 0 0 / 0.05),
+        0 2px 8px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05),
+        0 8px 10px -6px rgb(0 0 0 / 0.05);
+    --shadow-glow: 0 8px 16px -4px var(--color-primary-glow);
 
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Dark Mode */
+/* Dark Mode Overrides */
 body.dark-mode {
-    --bg-app: #0f172a;
-    --bg-panel: #1e293b;
-    --bg-hover: #334155;
-    --bg-selected: #312e81;
-    --bg-glass: rgba(30, 41, 59, 0.85);
+    --bg-app: #020617;
+    --bg-panel: #0f172a;
+    --bg-hover: #1e293b;
+    --bg-selected: #334155;
+    --bg-glass: rgba(15, 23, 42, 0.85);
 
     --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-light: #64748b;
+    --text-muted: #cbd5e1;
+    --text-light: #94a3b8;
 
-    --border-color: #334155;
+    --border-color: #1e293b;
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-md: 0 4px 20px -1px rgb(0 0 0 / 0.8), 0 2px 8px -2px rgb(0 0 0 / 0.8);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.8), 0 8px 10px -6px rgb(0 0 0 / 0.8);
+}
+
+body.dark-mode .opacity-50,
+body.dark-mode .opacity-75,
+body.dark-mode .opacity-85 {
+    opacity: 0.9 !important;
+}
+
+body.dark-mode .text-muted {
+    color: var(--text-muted) !important;
+}
+
+body.dark-mode .sidebar-item:not(.active) {
+    color: var(--text-muted) !important;
 }
 
 body.dark-mode ::-webkit-scrollbar-thumb {
@@ -90,6 +113,7 @@ body {
     color: var(--text-main);
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -317,6 +341,38 @@ body {
     }
 }
 
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fw-extra-bold {
+    font-weight: 800;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+.shadow-glow-primary {
+    box-shadow: 0 0 20px var(--color-primary-glow);
+}
+
 .spin {
     animation: spin 1s linear infinite;
     display: inline-block;
@@ -351,9 +407,21 @@ body {
     border-left: 3px solid transparent;
 }
 
+/* View Transition Shorthands */
+.view-enter {
+    animation: fadeIn var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        scaleIn var(--transition-normal) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.view-slide-enter {
+    animation: slideInLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+        fadeIn 0.3s ease-out forwards;
+}
+
 .email-row:hover {
     background-color: var(--bg-hover) !important;
     border-left-color: var(--color-primary);
+    transform: translateX(4px);
 }
 
 .email-row.selected {
@@ -404,18 +472,27 @@ body {
 
 .sidebar-item.active {
     background: var(--bg-selected) !important;
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px) scale(1.02);
+}
+
+.sidebar-item-pill {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-item.active .sidebar-item-pill {
+    color: white !important;
+    box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.4);
 }
 
 .sidebar-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 60%;
-    background: var(--gradient-primary);
-    border-radius: 0 4px 4px 0;
+    display: none;
 }
 
 .compose-btn {
@@ -533,6 +610,59 @@ body {
 
 .transition-opacity {
     transition: opacity var(--transition-fast);
+}
+
+.text-main {
+    color: var(--text-main) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-light {
+    color: var(--text-light) !important;
+}
+
+/* Base Dropdown Overrides */
+.dropdown-menu {
+    background-color: var(--bg-panel) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.dropdown-item {
+    color: var(--text-main) !important;
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--bg-hover) !important;
+    color: var(--color-primary) !important;
+}
+
+.dropdown-item i {
+    color: inherit;
+}
+
+body.dark-mode .dropdown-item,
+body.dark-mode .dropdown-item span {
+    color: var(--text-main) !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: var(--bg-selected) !important;
+    color: var(--color-primary) !important;
+}
+
+body.dark-mode .dropdown-item i {
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+}
+
+body.dark-mode .dropdown-item:hover i {
+    color: var(--color-primary) !important;
 }
 
 /* Glassmorphism */

@@ -160,14 +160,16 @@ export default function App() {
           }}
         />
 
-        <main className="flex-grow-1 d-flex minw-0 bg-white m-3 rounded-4 shadow-sm overflow-hidden border">
-          {/* Email List */}
+        <main className="flex-grow-1 d-flex minw-0 m-3 rounded-4 shadow-sm overflow-hidden border" style={{ backgroundColor: "var(--bg-panel)", borderColor: "var(--border-color)" }}>
+          {/* Email List - key triggers animation on folder change */}
           <div 
-            className={`${openMail ? 'd-none d-lg-flex' : 'd-flex'} flex-column minw-0 border-end`} 
+            key={folder}
+            className={`${openMail ? 'd-none d-lg-flex' : 'd-flex'} flex-column minw-0 border-end view-enter`} 
             style={{ 
               width: openMail ? `${listWidth}px` : "100%",
               minWidth: openMail ? "280px" : undefined,
-              flexShrink: 0
+              flexShrink: 0,
+              backgroundColor: "var(--bg-panel)"
             }}
           >
             <EmailList 
@@ -196,9 +198,9 @@ export default function App() {
             />
           )}
 
-          {/* Reading Pane */}
+          {/* Reading Pane - key triggers animation on mail change */}
           {openMail && (
-            <div className="flex-grow-1 d-flex flex-column minw-0 bg-white">
+            <div key={openMail.id} className="flex-grow-1 d-flex flex-column minw-0 view-slide-enter" style={{ backgroundColor: "var(--bg-panel)" }}>
               <ReadingPane 
                 mail={openMail} 
                 onClose={() => setOpenMail(null)} 
@@ -218,9 +220,10 @@ export default function App() {
           {/* Placeholder for when no mail is open on large screens */}
           {!openMail && (
             <div className="d-none d-lg-flex flex-grow-1 align-items-center justify-content-center" style={{ backgroundColor: "var(--bg-hover)" }}>
-              <div className="text-center text-muted">
-                <i className="bi bi-envelope fs-1 mb-3 opacity-25" />
-                <p>Select an email to read</p>
+              <div className="text-center text-muted fade-in">
+                <i className="bi bi-envelope-paper-heart fs-1 mb-4 opacity-25 text-primary" />
+                <h5 className="fw-bold text-main">Your Inbox is Waiting</h5>
+                <p className="small opacity-75">Select an email to start reading</p>
               </div>
             </div>
           )}

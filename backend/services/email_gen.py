@@ -536,6 +536,16 @@ def generate_email_json_forced(
     model = model or MODEL
     logger.info("generate_email_json_forced model=%s provider=%s", model, PROVIDER)
 
+    # Map language codes to full names for better AI understanding
+    LANG_MAP = {
+        "hi": "Hindi",
+        "te": "Telugu",
+        "ta": "Tamil",
+        "en": "English",
+        # Add more if needed
+    }
+    lang_name = LANG_MAP.get(target_lang, target_lang)
+
     enhanced = prompt_enhancer(user_prompt)
     
     # Auto-detect intent from prompt if not provided
@@ -559,16 +569,16 @@ def generate_email_json_forced(
             "When asked to produce an email, you MUST return ONLY valid JSON and nothing else. "
             "The JSON object MUST contain exactly two keys: subject (a short subject line) and body (the full email body with \\n\\n between paragraphs). "
             "Do NOT provide commentary, do not wrap JSON in markdown or code fences. Use placeholders like [Manager's Name] or [Your Name] if no names are provided. "
-            "IMPORTANT: Follow the user's prompt EXACTLY. If they ask for a simple greeting, write a simple greeting. If they ask for a request, write a request. Do not add content that wasn't requested."
+            f"IMPORTANT: The entire content (both subject and body) MUST be written in {lang_name}. "
+            "Professionalism and helpfulness are key. If a longer length is requested, provide more context, professional details, and appropriate elaboration while staying true to the user's intent."
         ),
     }
 
-    # Only include example if it's relevant to the user's request (request-related)
-    # Otherwise, skip the example to avoid biasing the model
+    # Only include example if it's relevant to the user's request AND target language is English
     messages = [system_msg]
     
-    # Include example only for request-related intents to avoid bias
-    if intent in ["request_info", "request_action"]:
+    # Include example only for English requests to avoid language bias in the output
+    if lang_name == "English" and intent in ["request_info", "request_action"]:
         example = {
             "role": "user",
             "content": """Example:
@@ -581,17 +591,28 @@ Return JSON only:
         }
         messages.append(example)
 
+    # Map length to specific word count instructions
+    LENGTH_MAP = {
+        "short": "approx 50-100 words (very concise)",
+        "medium": "approx 150-250 words (balanced detail)",
+        "detailed": "approx 300-500 words (thorough and comprehensive)"
+    }
+    length_instruction = LENGTH_MAP.get(length, "approx 150-250 words")
+
     user_msg = {
         "role": "user",
         "content": (
-            f"Compose an email based on the user's request. Follow their prompt EXACTLY - do not add extra content.\n\n"
+            f"MANDATORY: YOU MUST WRITE THE ENTIRE SUBJECT AND BODY IN {lang_name.upper()}.\n"
+            f"DO NOT USE ENGLISH. DO NOT USE PORTUGUESE. ONLY USE {lang_name.upper()}.\n\n"
+            f"Compose an email based on the user's request.\n"
             f"User's request: {enhanced}\n"
             f"Tone: {tone}\n"
-            f"Length: {length}\n"
-            f"Target language: {target_lang}\n\n"
+            f"Target length: {length_instruction}\n"
+            f"Target language: {lang_name}\n\n"
             "Return ONLY a single valid JSON object with keys: subject (string), body (string).\n"
+            f"Both 'subject' and 'body' MUST be in {lang_name}.\n"
             "Example format: {\"subject\":\"...\",\"body\":\"...\"}\n"
-            "Do not include any other text or explanation. Follow the user's request exactly.\n"
+            "Do not include any other text or explanation. Ensure the body is detailed enough to meet the target length.\n"
         ),
     }
 
