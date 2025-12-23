@@ -65,7 +65,7 @@ LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", 
 
 # Set default model based on provider
 if PROVIDER == "gemini":
-    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-1.5-flash") # Stable production model
+    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.0-flash-exp") # Use experimental model available on free tier
 elif PROVIDER == "ollama":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "llama2")
 elif PROVIDER == "local":
@@ -222,13 +222,19 @@ def call_openai_http(messages, model=MODEL, temperature=0.2, max_tokens=500):
         raise RuntimeError("Unexpected response from OpenAI HTTP API: " + str(data))
 
 
-def call_gemini_api(messages, model="gemini-2.5-flash", temperature=0.2, max_tokens=500):
+def call_gemini_api(messages, model="gemini-1.5-flash", temperature=0.2, max_tokens=500):
     """Call Google Gemini API (free tier available)"""
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY not set")
     
+    # Standardize model name for the API - use experimental model
+    if "gemini" not in model.lower():
+        model = "gemini-2.0-flash-exp"
+    
+    # Use v1beta for broader model support
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+    
     # Convert messages to Gemini format
-    # Gemini uses different message format - combine system + user messages
     text_parts = []
     for msg in messages:
         role = msg.get("role", "user")
@@ -241,22 +247,18 @@ def call_gemini_api(messages, model="gemini-2.5-flash", temperature=0.2, max_tok
             text_parts.append(f"Assistant: {content}")
     
     prompt_text = "\n\n".join(text_parts)
-    
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     payload = {
-        "contents": [{"parts": [{"text": prompt_text}]}],
+        "contents": [{"parts": [{"text": prompt_text or "Hello"}]}],
         "generationConfig": {
             "temperature": temperature,
             "maxOutputTokens": max_tokens,
-            # Disable thinking tokens to get more actual output
-            "responseModalities": ["TEXT"],
         }
     }
     
     # Use session with retries and longer timeout for connection stability
     session = get_session()
-    max_retries = 2
+    max_retries = 3
     last_error = None
     
     for attempt in range(max_retries):
@@ -269,6 +271,11 @@ def call_gemini_api(messages, model="gemini-2.5-flash", temperature=0.2, max_tok
                 logger.warning(f"Rate limited (429). Waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
                 time.sleep(wait_time)
                 continue
+            
+            # Log the actual error for 4xx responses
+            if r.status_code >= 400:
+                logger.error(f"Gemini API error {r.status_code}: {r.text[:500]}")
+                print(f"DEBUG Gemini API error {r.status_code}: {r.text[:500]}")
                 
             r.raise_for_status()
             data = r.json()
@@ -508,7 +515,7 @@ def call_local_model(messages, model="tinyllama", temperature=0.2, max_tokens=50
 def llm_chat(messages, model=MODEL, temperature=0.2, max_tokens=500):
     """Unified LLM chat interface supporting multiple providers"""
     if PROVIDER == "gemini":
-        return call_gemini_api(messages, model=model or "gemini-2.5-flash", temperature=temperature, max_tokens=max_tokens)
+        return call_gemini_api(messages, model=model or "gemini-2.0-flash-exp", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "ollama":
         return call_ollama_api(messages, model=model or "llama2", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "local":
