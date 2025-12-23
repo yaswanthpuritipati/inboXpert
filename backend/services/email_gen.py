@@ -65,7 +65,7 @@ LOCAL_MODEL_TYPE = os.getenv("LOCAL_MODEL_TYPE", "llama") # "llama", "mistral", 
 
 # Set default model based on provider
 if PROVIDER == "gemini":
-    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.0-flash-exp") # Use experimental model available on free tier
+    MODEL = os.getenv("EMAIL_GEN_MODEL", "gemini-2.5-flash") # Stable production model with higher quotas
 elif PROVIDER == "ollama":
     MODEL = os.getenv("EMAIL_GEN_MODEL", "llama2")
 elif PROVIDER == "local":
@@ -227,9 +227,9 @@ def call_gemini_api(messages, model="gemini-1.5-flash", temperature=0.2, max_tok
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY not set")
     
-    # Standardize model name for the API - use experimental model
+    # Standardize model name for the API - use stable model
     if "gemini" not in model.lower():
-        model = "gemini-2.0-flash-exp"
+        model = "gemini-2.5-flash"
     
     # Use v1beta for broader model support
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
@@ -515,7 +515,7 @@ def call_local_model(messages, model="tinyllama", temperature=0.2, max_tokens=50
 def llm_chat(messages, model=MODEL, temperature=0.2, max_tokens=500):
     """Unified LLM chat interface supporting multiple providers"""
     if PROVIDER == "gemini":
-        return call_gemini_api(messages, model=model or "gemini-2.0-flash-exp", temperature=temperature, max_tokens=max_tokens)
+        return call_gemini_api(messages, model=model or "gemini-2.5-flash", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "ollama":
         return call_ollama_api(messages, model=model or "llama2", temperature=temperature, max_tokens=max_tokens)
     elif PROVIDER == "local":
