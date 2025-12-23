@@ -12,7 +12,9 @@ export function TopBar({
   onSync, 
   onRefresh,
   theme,
-  toggleTheme
+  toggleTheme,
+  onOpenSettings,
+  onOpenPreferences
 }) {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
@@ -94,23 +96,23 @@ export function TopBar({
                   <div className="d-flex align-items-center justify-content-center fw-bold rounded-circle text-white shadow-sm" style={{ width: 36, height: 36, background: "var(--gradient-primary)" }}>
                     {userEmail[0]?.toUpperCase()}
                   </div>
-                  <span className="small fw-bold d-none d-md-block text-truncate text-main" style={{ maxWidth: "150px" }}>
+                  <span className="small fw-bold d-none d-md-block text-main">
                     {userEmail.split('@')[0]}
                   </span>
                 </button>
                 <div 
                   className={`dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 mt-2 rounded-4 animate-scale-in ${showDropdown ? 'show' : ''}`} 
-                  style={{ minWidth: "240px", backgroundColor: "var(--bg-glass)", backdropFilter: "blur(12px)" }}
+                  style={{ minWidth: "240px", backgroundColor: "var(--bg-panel)", backdropFilter: "blur(12px)" }}
                 >
-                  <div className="px-3 py-3 border-bottom mb-2">
-                    <p className="small text-muted mb-0 fw-medium">Logged in as</p>
-                    <p className="fw-bold text-main mb-0 text-truncate">{userEmail}</p>
+                  <div className="px-3 py-3 border-bottom mb-2" style={{ borderColor: "var(--border-color)" }}>
+                    <p className="small mb-0 fw-medium" style={{ color: "var(--text-muted)" }}>Logged in as</p>
+                    <p className="fw-bold mb-0" style={{ color: "var(--text-main)" }}>{userEmail}</p>
                   </div>
-                  <button className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3 text-main" onClick={() => setShowDropdown(false)}>
+                  <button className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3 text-main" onClick={() => { setShowDropdown(false); onOpenSettings(); }}>
                     <i className="bi bi-person-circle opacity-75" />
                     <span className="fw-medium">Account Settings</span>
                   </button>
-                  <button className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3 text-main" onClick={() => setShowDropdown(false)}>
+                  <button className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3 text-main" onClick={() => { setShowDropdown(false); onOpenPreferences(); }}>
                     <i className="bi bi-gear-fill opacity-75" />
                     <span className="fw-medium">Preferences</span>
                   </button>
