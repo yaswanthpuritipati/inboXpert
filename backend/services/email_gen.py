@@ -698,8 +698,10 @@ Return JSON only:
     if "regards" not in body.lower() and "sincerely" not in body.lower():
         body = f"{body}\n\nRegards,\n{signature_name}"
     elif sender_name:
-        # Replace placeholder with actual name if sender_name is provided
-        body = body.replace("[Your Name]", signature_name)
+        # Replace various placeholder patterns with actual name using regex
+        # Matches: [Your Name], [Your Name/Title], [Your Name Here], [Sender's Name], etc.
+        body = re.sub(r'\[Your Name[^\]]*\]', signature_name, body, flags=re.I)
+        body = re.sub(r"\[Sender'?s? Name[^\]]*\]", signature_name, body, flags=re.I)
 
     result = {
         "subject": subj or "(No subject)",
