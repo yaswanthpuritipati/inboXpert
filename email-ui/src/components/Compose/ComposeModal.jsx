@@ -27,7 +27,13 @@ export function ComposeModal({ userEmail, onSent, toast, initialData }) {
     if (!prompt.trim()) return toast({ title: "Enter a prompt", variant: "error" });
     setBusy(true);
     try {
-      const d = await api.draft({ prompt, tone, length, target_lang: lang });
+      // Extract sender name from email (use part before @, capitalize first letter)
+      const senderName = userEmail 
+        ? userEmail.split('@')[0].split('.').map(part => 
+            part.charAt(0).toUpperCase() + part.slice(1)
+          ).join(' ')
+        : "";
+      const d = await api.draft({ prompt, tone, length, target_lang: lang, sender_name: senderName });
       setDraft(d);
       toast({ title: "Draft ready", desc: d.intent, variant: "success" });
     } catch (e) {

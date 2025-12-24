@@ -20,12 +20,13 @@ class DraftReq(BaseModel):
     tone: str = "formal"
     length: str = "medium"
     target_lang: str = "en"
+    sender_name: str = ""  # Name of the logged-in user for signature
 
 @router.post("/draft")
 def create_draft(req: DraftReq):
     try:
-        logger.info("generate/draft request prompt=%s tone=%s length=%s", (req.prompt or "")[:120], req.tone, req.length)
-        out = generate_email_json_forced(req.prompt, tone=req.tone, length=req.length, target_lang=req.target_lang)
+        logger.info("generate/draft request prompt=%s tone=%s length=%s sender=%s", (req.prompt or "")[:120], req.tone, req.length, req.sender_name)
+        out = generate_email_json_forced(req.prompt, tone=req.tone, length=req.length, target_lang=req.target_lang, sender_name=req.sender_name)
         logger.info("Model raw (first 400 chars): %s", out.get("raw", "")[:400])
         return out
     except Exception as e:

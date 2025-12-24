@@ -556,6 +556,7 @@ def generate_email_json_forced(
     target_lang: str = "en",
     intent: Optional[str] = None,
     model: Optional[str] = None,
+    sender_name: str = "",
 ) -> Dict[str, str]:
     model = model or MODEL
     logger.info("generate_email_json_forced model=%s provider=%s", model, PROVIDER)
@@ -692,9 +693,13 @@ Return JSON only:
     # replace weekday mention with actual date if present in prompt
     body = replace_weekday_with_date(body, user_prompt)
 
-    # ensure signature
+    # ensure signature with user's name
+    signature_name = sender_name.strip() if sender_name else "[Your Name]"
     if "regards" not in body.lower() and "sincerely" not in body.lower():
-        body = f"{body}\n\nRegards,\n[Your Name]"
+        body = f"{body}\n\nRegards,\n{signature_name}"
+    elif sender_name:
+        # Replace placeholder with actual name if sender_name is provided
+        body = body.replace("[Your Name]", signature_name)
 
     result = {
         "subject": subj or "(No subject)",
