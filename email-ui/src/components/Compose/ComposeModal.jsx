@@ -27,11 +27,15 @@ export function ComposeModal({ userEmail, onSent, toast, initialData }) {
     if (!prompt.trim()) return toast({ title: "Enter a prompt", variant: "error" });
     setBusy(true);
     try {
-      // Extract sender name from email (use part before @, capitalize first letter)
+      // Extract sender name from email (use part before @)
+      // Remove trailing numbers, split by dots/underscores, capitalize each part
       const senderName = userEmail 
-        ? userEmail.split('@')[0].split('.').map(part => 
-            part.charAt(0).toUpperCase() + part.slice(1)
-          ).join(' ')
+        ? userEmail.split('@')[0]
+            .replace(/\d+$/, '')  // Remove trailing numbers like "2005"
+            .split(/[._]/)        // Split by dots or underscores
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+            .join(' ')
+            .trim()
         : "";
       const d = await api.draft({ prompt, tone, length, target_lang: lang, sender_name: senderName });
       setDraft(d);
